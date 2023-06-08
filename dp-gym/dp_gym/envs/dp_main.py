@@ -107,7 +107,6 @@ class dp_gym(gym.Env):
         self.obs_buffer[2][2] = state[1][2]/self.max_vel
         self.obs_buffer[2][3] = state[1][3]/self.max_vel
 
-        print(self.obs_buffer[2])
 
         return np.concatenate((self.obs_buffer[0], self.obs_buffer[1], self.obs_buffer[2]))
 
