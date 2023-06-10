@@ -92,18 +92,18 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
         return True
 
 # env = make_vec_env("hopping_leg-v0", n_envs=4)
-log_dir = "./logs/9Jun1/"
+log_dir = "./logs/11JunPS1/"
 os.makedirs(log_dir, exist_ok=True)
 env = make_vec_env("dp_gym-v0", n_envs=1, monitor_dir = log_dir)
 
-callback = SaveOnBestTrainingRewardCallback(check_freq=2400, log_dir=log_dir, verbose=1)
+callback = SaveOnBestTrainingRewardCallback(check_freq=15000, log_dir=log_dir, verbose=1)
 
 # policy_kwargs = dict(net_arch=[256, 128, 64, 32])  #19Jul6
 # policy_kwargs = dict(net_arch=[256, 128, 64])   #19Jul5
 policy_kwargs = dict(net_arch=[256, 256, 128, 128])  #19Jul7   Looked most effective  #21Jul17
 
 model = SAC("MlpPolicy", env, verbose=1, gamma = 0.99, use_sde = True, policy_kwargs = policy_kwargs)
-model.learn(total_timesteps=int(4e6), callback = callback)
+model.learn(total_timesteps=int(3e6), callback = callback)
 model.save(log_dir + "/sac_pendubot")
 
 # env = gym.make("hopping_leg-v0", render = False, rail = False)

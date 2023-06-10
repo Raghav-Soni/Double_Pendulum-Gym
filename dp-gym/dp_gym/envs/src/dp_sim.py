@@ -13,7 +13,7 @@ from dp_gym.envs.src.data.dp_anim import dp_plot
 
 class dp_simulation:
 
-    def __init__(self, design = "design_C.0", model = "model_3.0", robot = "acrobot", render = False, dt = 0.005):
+    def __init__(self, design = "design_C.0", model = "model_3.0", robot = "pendubot", render = False, dt = 0.005):
 
         # # model parameters
         if robot == "acrobot":

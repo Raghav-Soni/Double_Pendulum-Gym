@@ -8,7 +8,7 @@ from stable_baselines3.common.env_util import make_vec_env
 
 env = gym.make("dp_gym-v0", render = True, robot = "pendubot")
 
-model = PPO.load("../logs/18Jul4/model_169.zip")
+model = PPO.load("./logs/11JunPP1/model_2.zip")
 obs = env.reset()
 total_reward = 0
 while True:

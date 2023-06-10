@@ -8,7 +8,7 @@ from dp_gym.envs.src.dp_sim import dp_simulation
 
 class dp_gym(gym.Env):
     
-    def __init__(self, design = "design_C.0", model = "model_3.0", robot = "acrobot", render = False, dt = 0.005):
+    def __init__(self, design = "design_C.0", model = "model_3.0", robot = "pendubot", render = False, dt = 0.005):
 
         self.design = design
         self.model = model
@@ -20,12 +20,8 @@ class dp_gym(gym.Env):
         self.dt = dt
         self.t = 0
 
-        if(robot == "acrobot"):
-            action_high = np.array([0.0, 1.0])
-            action_low = -action_high
-        if(robot == "pendubot"):
-            action_high = np.array([1.0, 0.0])
-            action_low = -action_high            
+        action_high = np.array([1.0])
+        action_low = -action_high         
         
         self.action_space = spaces.Box(action_low, action_high)
 
@@ -39,7 +35,7 @@ class dp_gym(gym.Env):
 
         self.dp = dp_simulation(self.design, self.model, self.robot, self.render, self.dt)
 
-        self.max_vel = 20  #rad/sec
+        self.max_vel = 30  #rad/sec
         self.max_tq = 6    #Newtom-meter
 
 
@@ -48,10 +44,14 @@ class dp_gym(gym.Env):
         #assuming the actions are normalized, raw torque values  
 
         #Scaling the action values to torque limits
-        action[0] = self.max_tq*action[0]
-        action[1] = self.max_tq*action[1]
 
-        self.dp.step(action)  
+        tq = np.array([0.0, 0.0])
+        if(self.robot == "pendubot"):
+            tq[0] = self.max_tq*action[0]
+        if(self.robot == "acrobot"):
+            tq[1] = self.max_tq*action[0]
+
+        self.dp.step(tq)  
         self.t += self.dt
 
         observation = self.get_obs()
@@ -70,18 +70,23 @@ class dp_gym(gym.Env):
         pass
 
     def _caclulate_reward(self):
-        state = self.dp.get_state()
+        state = self.dp.get_state()[1]
 
         max_vel_flag = False
-        if(abs(state[1][2]) > self.max_vel or abs(state[1][3]) > self.max_vel):
+        if(abs(state[2]) > self.max_vel or abs(state[3]) > self.max_vel):
             max_vel_flag = True
 
+        a1_cos = np.cos(state[0])
+        a1_abs = np.arccos(a1_cos)
 
-        reward = 0 #Need to calculate reward based on the state
+        a2_cos = np.cos(state[1])
+        a2_abs = np.arccos(a2_cos)
+
+        reward = 0.001*(np.pi-a1_abs)*state[2] + 0.005*a2_abs*state[3] + 0.03*a1_abs + 0.06*(np.pi - a2_abs) #Need to calculate reward based on the state
         if(max_vel_flag == True):
-            reward -= 0    #0 should be replaced by a high negative value
+            reward -= 100   #0 should be replaced by a high negative value
 
-        if(self.t > 60 or max_vel_flag == True ):   #Each episode will be of 1 minute, if swinged up in time, good enough, otherwise end
+        if(self.t > 15 or max_vel_flag == True ):   #Each episode will be of 1 minute, if swinged up in time, good enough, otherwise end
             done = True
         else:
             done = False
@@ -97,13 +102,13 @@ class dp_gym(gym.Env):
         self.obs_buffer[1] = self.obs_buffer[2]
 
         a1_cos = np.cos(state[1][0])
-        a1 = np.arccos(a1_cos)
+        a1_abs = np.arccos(a1_cos)
 
         a2_cos = np.cos(state[1][1])
-        a2 = np.arccos(a2_cos)
+        a2_abs = np.arccos(a2_cos)
 
-        self.obs_buffer[2][0] = a1/np.pi
-        self.obs_buffer[2][1] = a2/np.pi
+        self.obs_buffer[2][0] = a1_abs/np.pi
+        self.obs_buffer[2][1] = a2_abs/np.pi
         self.obs_buffer[2][2] = state[1][2]/self.max_vel
         self.obs_buffer[2][3] = state[1][3]/self.max_vel
 
