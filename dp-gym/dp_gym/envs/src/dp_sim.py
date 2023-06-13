@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import numpy as np
 import yaml
+import random
 
 from double_pendulum.model.symbolic_plant import SymbolicDoublePendulum
 from double_pendulum.model.model_parameters import model_parameters
@@ -13,7 +14,7 @@ from dp_gym.envs.src.data.dp_anim import dp_plot
 
 class dp_simulation:
 
-    def __init__(self, design = "design_C.0", model = "model_3.0", robot = "pendubot", render = False, dt = 0.005):
+    def __init__(self, design, model, robot, render, dt, mode, roa):
 
         # # model parameters
         if robot == "acrobot":
@@ -22,6 +23,8 @@ class dp_simulation:
             torque_limit = [6.0, 0.0]
 
         self.render = render
+        self.mode = mode
+        self.roa = roa
 
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -93,5 +96,8 @@ class dp_simulation:
 
     def reset_state(self):
         time = 0
-        state = np.array([0.0, 0.0, 0.0, 0.0])
+        if(self.mode == 0): #Swing up
+            state = np.array([0.0, 0.0, 0.0, 0.0])
+        else:   #Stabilising on the top
+            state = np.array([random.uniform(self.roa[0], 2*np.pi - self.roa[0]), random.uniform(self.roa[1], 2*np.pi - self.roa[1]), 0.0, 0.0])
         self.sim.set_state(time, state)

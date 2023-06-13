@@ -96,9 +96,9 @@ log_dir = "./logs/11JunPP1/"
 os.makedirs(log_dir, exist_ok=True)
 env = make_vec_env("dp_gym-v0", n_envs=1, monitor_dir = log_dir)
 
-callback = SaveOnBestTrainingRewardCallback(check_freq=15000, log_dir=log_dir, verbose=1)
+callback = SaveOnBestTrainingRewardCallback(check_freq=150000, log_dir=log_dir, verbose=1)
 
-model = PPO("MlpPolicy", env, verbose=1, gamma = 1, use_sde = True)
+model = PPO("MlpPolicy", env, verbose=1, gamma = 1, use_sde = False)
 model.learn(total_timesteps=int(3e6), callback = callback)
 model.save(log_dir + "/ppo_pendubot")
 
