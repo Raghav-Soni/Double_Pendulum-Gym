@@ -33,7 +33,7 @@ class dp_gym(gym.Env):
 
         self.observation_space = spaces.Box(observation_low, observation_high)
 
-        self.roa = [165*np.pi/180, 165*np.pi/180]  #Region of attraction for which stabilising controller is trained
+        self.roa = [170*np.pi/180, 170*np.pi/180]  #Region of attraction for which stabilising controller is trained
 
         self.obs_buffer = np.array([[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]])
 
@@ -104,7 +104,7 @@ class dp_gym(gym.Env):
             reward -= 300   #0 should be replaced by a high negative value
         
         if(out_roa_flag == True):
-            reward -= 500
+            reward -= 3000
         
 
 
@@ -123,16 +123,33 @@ class dp_gym(gym.Env):
         self.obs_buffer[0] = self.obs_buffer[1]
         self.obs_buffer[1] = self.obs_buffer[2]
 
-        a1_cos = np.cos(state[1][0])
-        a1_abs = np.arccos(a1_cos)
+        # a1_cos = np.cos(state[1][0])
+        # a1_sin = np.sin(state[1][0])
+        # a1_abs = np.arccos(a1_cos)
 
-        a2_cos = np.cos(state[1][1])
-        a2_abs = np.arccos(a2_cos)
+        # a2_cos = np.cos(state[1][1])
+        # a2_sin = np.sin(state[1][1])
+        # a2_abs = np.arccos(a2_cos)
 
-        self.obs_buffer[2][0] = a1_abs/np.pi
-        self.obs_buffer[2][1] = a2_abs/np.pi
-        self.obs_buffer[2][2] = state[1][2]/self.max_vel
-        self.obs_buffer[2][3] = state[1][3]/self.max_vel
+        a1 = state[1][0]
+        a2 = state[1][1]
+
+        if(self.mode == 0):
+            a1_r = a1%(2*np.pi)
+            if(a1_r > np.pi):
+                a1_r = a1_r - 2*np.pi
+            a2_r = a2%(2*np.pi)
+            if(a2_r > np.pi):
+                a2_r = a2_r - 2*np.pi
+            self.obs_buffer[2][0] = a1_r/np.pi
+            self.obs_buffer[2][1] = a2_r/np.pi
+            self.obs_buffer[2][2] = state[1][2]/self.max_vel
+            self.obs_buffer[2][3] = state[1][3]/self.max_vel
+        else:
+            self.obs_buffer[2][0] = (a1%(2*np.pi))/(2*np.pi)
+            self.obs_buffer[2][1] = (a2%(2*np.pi))/(2*np.pi)
+            self.obs_buffer[2][2] = state[1][2]/self.max_vel
+            self.obs_buffer[2][3] = state[1][3]/self.max_vel            
 
 
         return np.concatenate((self.obs_buffer[0], self.obs_buffer[1], self.obs_buffer[2]))
