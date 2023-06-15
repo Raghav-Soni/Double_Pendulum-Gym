@@ -6,7 +6,7 @@ import time
 env = gym.make("dp_gym-v0", render = True, robot = "pendubot")
 obs = env.reset()
 
-actions = [0.2]
+actions = [-0.8]
 obs, reward, done, _ = env.step(actions)
 while(True):
     obs, reward, done, _ = env.step(actions)

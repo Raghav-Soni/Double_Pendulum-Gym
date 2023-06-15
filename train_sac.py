@@ -92,7 +92,7 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
         return True
 
 # env = make_vec_env("hopping_leg-v0", n_envs=4)
-log_dir = "../logs/swingup/14JunPS1/"
+log_dir = "../logs/stabilise/16JunPS1/"
 os.makedirs(log_dir, exist_ok=True)
 env = make_vec_env("dp_gym-v0", n_envs=1, monitor_dir = log_dir)
 

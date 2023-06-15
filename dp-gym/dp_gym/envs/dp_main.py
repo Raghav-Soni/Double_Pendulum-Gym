@@ -33,7 +33,11 @@ class dp_gym(gym.Env):
 
         self.observation_space = spaces.Box(observation_low, observation_high)
 
-        self.roa = [170*np.pi/180, 170*np.pi/180]  #Region of attraction for which stabilising controller is trained
+
+        if(self.robot == "acrobot"):
+            self.roa = [170*np.pi/180, 170*np.pi/180]  #Region of attraction for which stabilising controller is trained
+        else:
+            self.roa = [170*np.pi/180, 170*np.pi/180]
 
         self.obs_buffer = np.array([[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]])
 
@@ -95,10 +99,18 @@ class dp_gym(gym.Env):
                 out_roa_flag = True
 
 
-        if(self.mode == 0):   #Swing up
-            reward = 0.001*(np.pi-a1_abs)*state[2] + 0.005*(np.pi-a2_abs)*state[3] + 3*(a1_abs) + 6*(a2_abs) #Need to calculate reward based on the state
-        else:    #Stabilise
-            reward = -0.001*state[2] - 0.005*state[3] + 3*(a1_abs - np.pi) + 6*(a2_abs - np.pi)
+        if(self.robot == "pendubot"):
+            if(self.mode == 0):   #Swing up
+                reward = 0.0001*(np.pi-a1_abs)*state[2] + 0.0005*(a2_abs)*state[3] + 0.6*(a1_abs) + 0.3*(np.pi - a2_abs) #Need to calculate reward based on the state
+            else:    #Stabilise
+                reward = -0.001*state[2] - 0.005*state[3] + 6*(a1_abs - np.pi) - 3*(a2_abs)
+        if(self.robot == "acrobot"):
+            if(self.mode == 0):   #Swing up
+                # reward = 0.0005*(np.pi-a1_abs)*state[2] + 0.0001*(a2_abs)*state[3] + 0.6*(a1_abs) + 0.3*(np.pi - a2_abs) #Need to calculate reward based on the state
+                reward = 0.0005*(self.roa[0]-a1_abs)*state[2] + 0.0001*(a2_abs)*state[3] + 0.6*(a1_abs) + 0.3*(np.pi - a2_abs) #Need to calculate reward based on the state
+            else:    #Stabilise
+                #reward = -0.005*state[2] - 0.001*state[3] + 12*(a1_abs - np.pi) - 6*(a2_abs)
+                reward = 12*(a1_abs - np.pi) - 6*(a2_abs)
 
         if(max_vel_flag == True):
             reward -= 300   #0 should be replaced by a high negative value
@@ -146,8 +158,11 @@ class dp_gym(gym.Env):
             self.obs_buffer[2][2] = state[1][2]/self.max_vel
             self.obs_buffer[2][3] = state[1][3]/self.max_vel
         else:
+            a2_r = a2%(2*np.pi)
+            if(a2_r > np.pi):
+                a2_r = a2_r - 2*np.pi
             self.obs_buffer[2][0] = (a1%(2*np.pi))/(2*np.pi)
-            self.obs_buffer[2][1] = (a2%(2*np.pi))/(2*np.pi)
+            self.obs_buffer[2][1] = a2_r/np.pi
             self.obs_buffer[2][2] = state[1][2]/self.max_vel
             self.obs_buffer[2][3] = state[1][3]/self.max_vel            
 

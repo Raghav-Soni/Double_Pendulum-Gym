@@ -22,8 +22,8 @@ class dp_plot:
         x1 = self.l1 * np.sin(x[0])
         y1 = -self.l1 * np.cos(x[0])
 
-        x2 = x1 + self.l2 * np.sin(x[1])
-        y2 = y1 - self.l2 * np.cos(x[1])
+        x2 = x1 + self.l2 * np.sin(x[0]+x[1])
+        y2 = y1 - self.l2 * np.cos(x[0]+x[1])
 
         self.ax.plot([0, x1, x2], [0, y1, y2], lw=2, c='k')
 
