@@ -8,7 +8,7 @@ from dp_gym.envs.src.dp_sim import dp_simulation
 
 class dp_gym(gym.Env):
     
-    def __init__(self, design = "design_C.0", model = "model_3.0", robot = "pendubot", render = False, dt = 0.005, mode = 0):
+    def __init__(self, design = "design_C.0", model = "model_3.0", robot = "pendubot", render = False, dt = 0.005, mode = 1):
 
         self.design = design
         self.model = model
@@ -35,9 +35,9 @@ class dp_gym(gym.Env):
 
 
         if(self.robot == "acrobot"):
-            self.roa = [170*np.pi/180, 170*np.pi/180]  #Region of attraction for which stabilising controller is trained
+            self.roa = [170*np.pi/180, 10*np.pi/180]  #Region of attraction for which stabilising controller is trained
         else:
-            self.roa = [170*np.pi/180, 170*np.pi/180]
+            self.roa = [170*np.pi/180, 10*np.pi/180]
 
         self.obs_buffer = np.array([[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]])
 
@@ -95,7 +95,7 @@ class dp_gym(gym.Env):
         a2_abs = np.arccos(a2_cos)
 
         if(self.mode == 1):
-            if(a1_abs < self.roa[0] or a2_abs < self.roa[1]):
+            if(a1_abs < self.roa[0] or a2_abs > self.roa[1]):
                 out_roa_flag = True
 
 
@@ -103,7 +103,8 @@ class dp_gym(gym.Env):
             if(self.mode == 0):   #Swing up
                 reward = 0.0001*(np.pi-a1_abs)*state[2] + 0.0005*(a2_abs)*state[3] + 0.6*(a1_abs) + 0.3*(np.pi - a2_abs) #Need to calculate reward based on the state
             else:    #Stabilise
-                reward = -0.001*state[2] - 0.005*state[3] + 6*(a1_abs - np.pi) - 3*(a2_abs)
+                # reward = -0.001*state[2] - 0.005*state[3] + 6*(a1_abs - np.pi) - 3*(a2_abs)
+                reward = 6*(a1_abs - np.pi) - 3*(a2_abs)
         if(self.robot == "acrobot"):
             if(self.mode == 0):   #Swing up
                 # reward = 0.0005*(np.pi-a1_abs)*state[2] + 0.0001*(a2_abs)*state[3] + 0.6*(a1_abs) + 0.3*(np.pi - a2_abs) #Need to calculate reward based on the state

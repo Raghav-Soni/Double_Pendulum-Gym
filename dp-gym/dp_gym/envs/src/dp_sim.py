@@ -99,5 +99,5 @@ class dp_simulation:
         if(self.mode == 0): #Swing up
             state = np.array([0.0, 0.0, 0.0, 0.0])
         else:   #Stabilising on the top
-            state = np.array([random.uniform(self.roa[0], 2*np.pi - self.roa[0]), random.uniform(self.roa[1], 2*np.pi - self.roa[1]), 0.0, 0.0])
+            state = np.array([random.uniform(self.roa[0], 2*np.pi - self.roa[0]), random.uniform(-self.roa[1], self.roa[1]), 0.0, 0.0])
         self.sim.set_state(time, state)

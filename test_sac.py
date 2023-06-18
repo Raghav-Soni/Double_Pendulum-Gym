@@ -6,9 +6,9 @@ import time
 from stable_baselines3 import SAC
 from stable_baselines3.common.env_util import make_vec_env
 
-env = gym.make("dp_gym-v0", render = True, robot = "acrobot")
+env = gym.make("dp_gym-v0", render = True, robot = "pendubot")
 
-model = SAC.load("../logs/swingup/15JunAS3/model_23.zip") 
+model = SAC.load("../logs/swingup/16JunPS1/model_7.zip") 
 obs = env.reset()
 total_reward = 0
 i = 0
